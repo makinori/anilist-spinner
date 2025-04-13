@@ -15,3 +15,5 @@ Also prints a table with information
 <br />
 
 Code is a bit messy but really didn't want to use html
+
+Use `TEST_DATA=1` for test data
