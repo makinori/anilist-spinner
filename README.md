@@ -8,9 +8,10 @@ Uses episode durations to weigh spinner
 
 Also prints a table with information
 
-<img width="450" src="https://github.com/user-attachments/assets/a70f63eb-77d3-4093-9043-90cb29cf91b8" />
-<br />
+<video src="https://github.com/user-attachments/assets/1a3c72e6-e0ff-4f68-8ad2-2483b620f9db"></video>
+
 <img width="350" src="https://github.com/user-attachments/assets/ef0246bd-add9-4709-b519-2c8560ffacf8" />
+
 <br />
 <br />
 
