@@ -44,20 +44,24 @@ func getAnimeData() []AnimeResult {
 }
 
 func getTestAnimeData() []AnimeResult {
-	return []AnimeResult{
+	data := []AnimeResult{
 		{Title: "anime a",
-			Progress: 4, Episodes: 24, Color: "#ff0000",
-			Duration: 20, EpisodesLeft: 20, MinutesLeft: 400},
+			Progress: 4, Episodes: 23, Duration: 19, Color: "#ff0000"},
 		{Title: "anime b: is really damn cool",
-			Progress: 5, Episodes: 24, Color: "#00ff00",
-			Duration: 20, EpisodesLeft: 18, MinutesLeft: 360},
+			Progress: 5, Episodes: 20, Duration: 21, Color: "#00ff00"},
 		{Title: "anime c - isnt it!!?",
-			Progress: 6, Episodes: 24, Color: "#0000ff",
-			Duration: 20, EpisodesLeft: 16, MinutesLeft: 320},
+			Progress: 6, Episodes: 22, Duration: 22, Color: "#0000ff"},
 		{Title: "anime d: the long lived gopher and its legacy",
-			Progress: 7, Episodes: 24, Color: "#ff00ff",
-			Duration: 20, EpisodesLeft: 14, MinutesLeft: 280},
+			Progress: 7, Episodes: 20, Duration: 30, Color: "#ff00ff"},
 	}
+
+	for i := range data {
+		anime := data[i]
+		data[i].EpisodesLeft = anime.Episodes - anime.Progress
+		data[i].MinutesLeft = anime.Duration * data[i].EpisodesLeft
+	}
+
+	return data
 }
 
 var titleShortenerRegExp = regexp.MustCompile("^(.+)[:-]")
