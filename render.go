@@ -147,7 +147,7 @@ func playClickSound() {
 	rl.PlaySound(clickSound)
 }
 
-func runRaylibProgram(animes []AnimeResult, noSpin bool) {
+func runRaylibProgram(animes []AnimeResult, options ProgramOptions) {
 	var windowSize int32 = 800
 
 	rl.SetConfigFlags(rl.FlagMsaa4xHint)
@@ -156,19 +156,21 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 	rl.InitWindow(windowSize, windowSize, "AniList Spinner")
 	defer rl.CloseWindow()
 
-	rl.InitAudioDevice()
-	defer rl.CloseAudioDevice()
-
 	rl.SetTargetFPS(-1)
 
-	{
+	if !options.NoSound {
+		rl.InitAudioDevice()
+		defer rl.CloseAudioDevice()
+
 		clickSoundWave := rl.LoadWaveFromMemory(
 			".wav", clickSoundWav, int32(len(clickSoundWav)),
 		)
-		defer rl.UnloadWave(clickSoundWave)
+
 		clickSound = rl.LoadSoundFromWave(clickSoundWave)
+		defer rl.UnloadSound(clickSound)
+
+		rl.UnloadWave(clickSoundWave)
 	}
-	defer rl.UnloadSound(clickSound)
 
 	// var lastTitle string
 	// updateTitle := func(anime AnimeResult) {
@@ -210,7 +212,7 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 
 		// update rotation
 
-		if !spinning && !noSpin {
+		if !spinning && !options.NoSpin {
 			// idle spinning
 			rotation = float32(rl.GetTime() * 10)
 		}
@@ -231,7 +233,7 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 		drawAnimePie(animes, rotation, cameraShake.GetPosOnFrame())
 
 		// return early
-		if noSpin {
+		if options.NoSpin {
 			rl.EndDrawing()
 			continue
 		}
@@ -261,7 +263,9 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 
 		if lastAnime != currentAnime {
 			playClickSound()
-			cameraShake.DoShake()
+			if !options.NoShake {
+				cameraShake.DoShake()
+			}
 			lastAnime = currentAnime
 		}
 

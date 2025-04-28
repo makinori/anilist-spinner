@@ -64,19 +64,28 @@ var titleShortenerRegExp = regexp.MustCompile("^(.+)[:-]")
 
 var _, useTestData = os.LookupEnv("TEST_DATA")
 
+type ProgramOptions struct {
+	NoSpin  bool
+	NoShake bool
+	NoSound bool
+}
+
 func main() {
 	flag.CommandLine.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
 		fmt.Fprintf(
 			flag.CommandLine.Output(),
-			"  [options] <anilist username> <...anilist ids>\n",
+			"  [options] <anilist username> <anilist ids...>\n",
 		)
 		fmt.Fprintln(flag.CommandLine.Output(), "\nOptions:")
 		flag.PrintDefaults()
 	}
 
-	var noSpin bool
-	flag.BoolVar(&noSpin, "no-spin", false, "disable spinning")
+	var options ProgramOptions
+
+	flag.BoolVar(&options.NoSpin, "no-spin", false, "disable spinning, hides button")
+	flag.BoolVar(&options.NoShake, "no-shake", false, "disable screen shake")
+	flag.BoolVar(&options.NoSound, "no-sound", false, "disable sounds")
 
 	flag.Parse()
 
@@ -151,5 +160,5 @@ func main() {
 
 	// run raylib program
 
-	runRaylibProgram(animes, noSpin)
+	runRaylibProgram(animes, options)
 }
