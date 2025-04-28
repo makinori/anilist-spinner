@@ -1,10 +1,17 @@
 package main
 
 import (
+	_ "embed"
 	"log"
 	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
+)
+
+var (
+	//go:embed sounds/click.wav
+	clickSoundWav []byte
+	clickSound    rl.Sound
 )
 
 func fitTextToWidth(
@@ -121,6 +128,15 @@ func getAnimeFromRotation(animes []AnimeResult, rotation float32) AnimeResult {
 	return AnimeResult{}
 }
 
+func playClickSound() {
+	var pitchRange float32 = 0.3
+	var minPitch float32 = 1 - pitchRange
+	var maxPitch float32 = 1 + pitchRange
+	pitch := minPitch + rand.Float32()*(maxPitch-minPitch)
+	rl.SetSoundPitch(clickSound, pitch)
+	rl.PlaySound(clickSound)
+}
+
 func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 	var windowSize int32 = 800
 
@@ -130,7 +146,19 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 	rl.InitWindow(windowSize, windowSize, "AniList Spinner")
 	defer rl.CloseWindow()
 
+	rl.InitAudioDevice()
+	defer rl.CloseAudioDevice()
+
 	rl.SetTargetFPS(-1)
+
+	{
+		clickSoundWave := rl.LoadWaveFromMemory(
+			".wav", clickSoundWav, int32(len(clickSoundWav)),
+		)
+		defer rl.UnloadWave(clickSoundWave)
+		clickSound = rl.LoadSoundFromWave(clickSoundWave)
+	}
+	defer rl.UnloadSound(clickSound)
 
 	// var lastTitle string
 	// updateTitle := func(anime AnimeResult) {
@@ -155,6 +183,8 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 	}
 
 	const rotationSharpness float32 = 0.5
+
+	var lastAnime AnimeResult = animes[0]
 
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
@@ -216,6 +246,12 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 		}
 
 		currentAnime := getAnimeFromRotation(animes, rotation)
+
+		if lastAnime != currentAnime {
+			playClickSound()
+			lastAnime = currentAnime
+		}
+
 		// updateTitle(currentAnime)
 
 		// draw text
