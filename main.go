@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -13,13 +14,15 @@ import (
 )
 
 func getAnimeData() []AnimeResult {
-	if len(os.Args) <= 1 {
-		fmt.Println("usage: <anilist username> <anilist id...>")
-		os.Exit(1)
+	args := flag.Args()
+
+	if len(args) <= 1 {
+		flag.Usage()
+		os.Exit(0)
 	}
 
-	username := os.Args[1]
-	animeIds := os.Args[2:]
+	username := args[0]
+	animeIds := args[1:]
 
 	var animes []AnimeResult
 
@@ -62,6 +65,21 @@ var titleShortenerRegExp = regexp.MustCompile("^(.+)[:-]")
 var _, useTestData = os.LookupEnv("TEST_DATA")
 
 func main() {
+	flag.CommandLine.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:\n", os.Args[0])
+		fmt.Fprintf(
+			flag.CommandLine.Output(),
+			"  [options] <anilist username> <...anilist ids>\n",
+		)
+		fmt.Fprintln(flag.CommandLine.Output(), "\nOptions:")
+		flag.PrintDefaults()
+	}
+
+	var noSpin bool
+	flag.BoolVar(&noSpin, "no-spin", false, "disable spinning")
+
+	flag.Parse()
+
 	var animes []AnimeResult
 
 	if useTestData {
@@ -133,5 +151,5 @@ func main() {
 
 	// run raylib program
 
-	runRaylibProgram(animes)
+	runRaylibProgram(animes, noSpin)
 }

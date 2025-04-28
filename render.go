@@ -101,7 +101,7 @@ func getAnimeFromRotation(animes []AnimeResult, rotation float32) AnimeResult {
 	return AnimeResult{}
 }
 
-func runRaylibProgram(animes []AnimeResult) {
+func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 	var windowSize int32 = 800
 
 	rl.SetConfigFlags(rl.FlagMsaa4xHint)
@@ -129,7 +129,7 @@ func runRaylibProgram(animes []AnimeResult) {
 	spinning := false
 
 	doSpin := func() {
-		rotation = 0 // cause we were idle spinning
+		rotation = 0 // cause we were idle rotating
 		targetRotation = rotation + (360 * float32(randFloat(20, 30)))
 		spinning = true
 	}
@@ -141,7 +141,7 @@ func runRaylibProgram(animes []AnimeResult) {
 
 		// update rotation
 
-		if !spinning {
+		if !spinning && !noSpin {
 			// idle spinning
 			rotation = float32(rl.GetTime() * 10)
 		}
@@ -167,6 +167,12 @@ func runRaylibProgram(animes []AnimeResult) {
 		)
 
 		drawAnimeCircle(animes, rotation)
+
+		// return early
+		if noSpin {
+			rl.EndDrawing()
+			continue
+		}
 
 		// draw triangle
 		{
