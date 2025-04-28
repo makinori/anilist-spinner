@@ -43,8 +43,16 @@ func hexStrColor(hexStr string) color.RGBA {
 	}
 }
 
-func lerp(a, b, t float32) float32 {
+func lerpF32(a, b, t float32) float32 {
 	return a + (b-a)*t
+}
+
+func lerpF64(a, b, t float64) float64 {
+	return a + (b-a)*t
+}
+
+func invLerpF64(a, b, v float64) float64 {
+	return (v - a) / (b - a)
 }
 
 func randFloat(min, max float64) float64 {

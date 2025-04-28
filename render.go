@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"log"
 	"math"
+	"math/rand/v2"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -38,7 +39,7 @@ func fitTextToWidth(
 	return fontSize, spacing, textSize
 }
 
-func drawAnimePie(animes []AnimeResult, rotation float32) {
+func drawAnimePie(animes []AnimeResult, rotation float32, offset rl.Vector2) {
 	rotation = 360 - float32(math.Mod(float64(rotation), 360))
 
 	circleDiameter := float32(rl.GetScreenWidth()) - 50
@@ -48,6 +49,15 @@ func drawAnimePie(animes []AnimeResult, rotation float32) {
 		X: float32(rl.GetScreenWidth()) * 0.5,
 		Y: float32(rl.GetScreenHeight()) * 0.5,
 	}
+
+	screenCenter = rl.Vector2Add(screenCenter, offset)
+
+	// pie shadow
+	dimmer := rl.RayWhite
+	dimmer.A = 32
+	rl.DrawCircleSector(
+		screenCenter, float32(rl.GetScreenWidth())*0.5, 0, 360, 512, dimmer,
+	)
 
 	lastAngle := -90 + rotation
 
@@ -186,6 +196,15 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 
 	var lastAnime AnimeResult = animes[0]
 
+	cameraShake, err := NewOneShotShake()
+	if err != nil {
+		panic(err)
+	}
+
+	cameraShake.Amount = 16
+	cameraShake.Speed = 16
+	cameraShake.Duration = 0.2
+
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 
@@ -197,7 +216,7 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 		}
 
 		if rotation != targetRotation {
-			rotation = lerp(
+			rotation = lerpF32(
 				rotation, targetRotation, rotationSharpness*rl.GetFrameTime(),
 			)
 		}
@@ -209,14 +228,7 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 
 		rl.ClearBackground(rl.Black)
 
-		dimmer := rl.RayWhite
-		dimmer.A = 32
-		rl.DrawCircleSector(
-			rl.Vector2{X: screenWidth * 0.5, Y: screenHeight * 0.5},
-			screenWidth*0.5, 0, 360, 512, dimmer,
-		)
-
-		drawAnimePie(animes, rotation)
+		drawAnimePie(animes, rotation, cameraShake.GetPosOnFrame())
 
 		// return early
 		if noSpin {
@@ -249,6 +261,7 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 
 		if lastAnime != currentAnime {
 			playClickSound()
+			cameraShake.DoShake()
 			lastAnime = currentAnime
 		}
 
