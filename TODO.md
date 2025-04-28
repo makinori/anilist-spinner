@@ -1,3 +1,1 @@
 -   add sounds
--   shade with episode duration
--   add non spin mode

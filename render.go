@@ -31,7 +31,7 @@ func fitTextToWidth(
 	return fontSize, spacing, textSize
 }
 
-func drawAnimeCircle(animes []AnimeResult, rotation float32) {
+func drawAnimePie(animes []AnimeResult, rotation float32) {
 	rotation = 360 - float32(math.Mod(float64(rotation), 360))
 
 	circleDiameter := float32(rl.GetScreenWidth()) - 50
@@ -47,22 +47,42 @@ func drawAnimeCircle(animes []AnimeResult, rotation float32) {
 	var animeTextRotations []float32
 
 	for _, anime := range animes {
-		var endAngle float32 = lastAngle + (360.0 * anime.Weight)
+		var animeStartAngle float32 = lastAngle
+		var animeEndAngle float32 = animeStartAngle + (360.0 * anime.Weight)
 
-		rl.DrawCircleSector(
-			screenCenter, circleRadius,
-			lastAngle, endAngle,
-			512, hexStrColor(anime.Color),
-		)
+		// seperate sectors by episodes left
 
-		animeTextRotation := lastAngle + ((endAngle - lastAngle) * 0.5)
+		angleWidth := animeEndAngle - animeStartAngle
+		epAngleWidth := angleWidth / float32(anime.EpisodesLeft)
+
+		animeColor := hexStrColor(anime.Color)
+		animeAltColor := rl.ColorBrightness(animeColor, -0.05)
+
+		for i := range anime.EpisodesLeft {
+			var epStartAngle float32 = animeStartAngle + (epAngleWidth * float32(i))
+			var epEndAngle float32 = epStartAngle + epAngleWidth
+
+			epColor := animeColor
+			if i%2 == 1 {
+				epColor = animeAltColor
+			}
+
+			rl.DrawCircleSector(
+				screenCenter, circleRadius,
+				epStartAngle, epEndAngle,
+				16, epColor,
+			)
+		}
+
+		// add text rotation
+
+		animeTextRotation := animeStartAngle + (angleWidth * 0.5)
 		animeTextRotations = append(animeTextRotations, animeTextRotation)
 
-		lastAngle = endAngle
+		lastAngle = animeEndAngle
 	}
 
 	for i, anime := range animes {
-
 		fontSize, spacing, textSize := fitTextToWidth(
 			anime.Title, 64, 8, circleRadius-50,
 		)
@@ -166,7 +186,7 @@ func runRaylibProgram(animes []AnimeResult, noSpin bool) {
 			screenWidth*0.5, 0, 360, 512, dimmer,
 		)
 
-		drawAnimeCircle(animes, rotation)
+		drawAnimePie(animes, rotation)
 
 		// return early
 		if noSpin {
