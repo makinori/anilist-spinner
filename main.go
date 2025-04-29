@@ -17,7 +17,7 @@ func getAnimeData() []AnimeResult {
 	args := flag.Args()
 
 	if len(args) <= 1 {
-		flag.Usage()
+		flag.CommandLine.Usage()
 		os.Exit(0)
 	}
 
