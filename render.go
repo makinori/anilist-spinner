@@ -11,7 +11,7 @@ import (
 
 var (
 	//go:embed sounds/click.wav
-	clickSoundWav []byte
+	clickSoundWav []byte // from https://sfxr.me
 	clickSound    rl.Sound
 )
 
