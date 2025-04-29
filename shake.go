@@ -36,6 +36,10 @@ func (shake *OneShotShake) DoShake() {
 }
 
 func (shake *OneShotShake) GetPosOnFrame() rl.Vector2 {
+	if shake.CurrentTimestamp < 0 {
+		return rl.Vector2Zero()
+	}
+
 	time := rl.GetTime()
 
 	t := time * float64(shake.Speed)
@@ -44,17 +48,15 @@ func (shake *OneShotShake) GetPosOnFrame() rl.Vector2 {
 
 	var intensity float64
 
-	if shake.CurrentTimestamp >= 0 {
-		if time >= shake.CurrentTimestamp+shake.Duration {
-			shake.CurrentTimestamp = -1
-		} else {
-			// could add easing
-			intensity = invLerpF64(
-				shake.CurrentTimestamp+shake.Duration,
-				shake.CurrentTimestamp,
-				time,
-			)
-		}
+	if time >= shake.CurrentTimestamp+shake.Duration {
+		shake.CurrentTimestamp = -1
+	} else {
+		// could add easing
+		intensity = invLerpF64(
+			shake.CurrentTimestamp+shake.Duration,
+			shake.CurrentTimestamp,
+			time,
+		)
 	}
 
 	amount := shake.Amount * intensity
