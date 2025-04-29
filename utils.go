@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image/color"
+	"math"
 	"math/rand"
 	"regexp"
 	"strconv"
@@ -57,4 +58,8 @@ func invLerpF64(a, b, v float64) float64 {
 
 func randFloat(min, max float64) float64 {
 	return min + rand.Float64()*(max-min)
+}
+
+func clamp(v, min, max float64) float64 {
+	return math.Max(math.Min(v, max), min)
 }

@@ -162,6 +162,8 @@ func runRaylibProgram(animes []AnimeResult, options ProgramOptions) {
 		rl.InitAudioDevice()
 		defer rl.CloseAudioDevice()
 
+		rl.SetMasterVolume(float32(options.Volume))
+
 		clickSoundWave := rl.LoadWaveFromMemory(
 			".wav", clickSoundWav, int32(len(clickSoundWav)),
 		)

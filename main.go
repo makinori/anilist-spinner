@@ -72,6 +72,7 @@ type ProgramOptions struct {
 	NoSpin  bool
 	NoShake bool
 	NoSound bool
+	Volume  float64
 }
 
 func main() {
@@ -90,8 +91,10 @@ func main() {
 	flag.BoolVar(&options.NoSpin, "no-spin", false, "disable spinning, hides button")
 	flag.BoolVar(&options.NoShake, "no-shake", false, "disable screen shake")
 	flag.BoolVar(&options.NoSound, "no-sound", false, "disable sounds")
-
+	flag.Float64Var(&options.Volume, "volume", 0.8, "between 0 to 1")
 	flag.Parse()
+
+	options.Volume = clamp(options.Volume, 0, 1)
 
 	var animes []AnimeResult
 
