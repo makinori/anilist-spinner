@@ -121,7 +121,7 @@ func drawAnimePie(animes []AnimeResult, rotation float32, offset rl.Vector2) {
 	}
 }
 
-func getAnimeFromRotation(animes []AnimeResult, rotation float32) AnimeResult {
+func getAnimeFromRotation(animes []*AnimeResult, rotation float32) *AnimeResult {
 	rotationNormalized := float32(math.Mod(float64(rotation), 360)) / 360
 
 	var seenWeight float32 = 0
@@ -135,7 +135,7 @@ func getAnimeFromRotation(animes []AnimeResult, rotation float32) AnimeResult {
 
 	log.Fatalln("weights didn't add up properly")
 
-	return AnimeResult{}
+	return nil
 }
 
 func playClickSound() {
@@ -148,6 +148,11 @@ func playClickSound() {
 }
 
 func runRaylibProgram(animes []AnimeResult, options ProgramOptions) {
+	var animePointers []*AnimeResult
+	for _, anime := range animes {
+		animePointers = append(animePointers, &anime)
+	}
+
 	var windowSize int32 = 800
 
 	rl.SetConfigFlags(rl.FlagMsaa4xHint)
@@ -198,7 +203,7 @@ func runRaylibProgram(animes []AnimeResult, options ProgramOptions) {
 
 	const rotationSharpness float32 = 0.5
 
-	var lastAnime AnimeResult = animes[0]
+	lastAnime := animePointers[0]
 
 	cameraShake, err := NewOneShotShake()
 	if err != nil {
@@ -261,7 +266,7 @@ func runRaylibProgram(animes []AnimeResult, options ProgramOptions) {
 			)
 		}
 
-		currentAnime := getAnimeFromRotation(animes, rotation)
+		currentAnime := getAnimeFromRotation(animePointers, rotation)
 
 		if lastAnime != currentAnime {
 			playClickSound()
