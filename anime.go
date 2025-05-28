@@ -19,7 +19,9 @@ query($userName: String, $mediaId: Int)  {
     episodes
     title {
       english
+      romaji
     }
+	synonyms
 	bannerImage
 	coverImage {
 	  color
@@ -52,8 +54,10 @@ type SearchQueryResult struct {
 			Episodes int `json:"episodes"`
 			Title    struct {
 				English string `json:"english"`
+				Romaji  string `json:"romaji"`
 			} `json:"title"`
-			BannerImage string `json:"bannerImage"`
+			Synonyms    []string `json:"synonyms"`
+			BannerImage string   `json:"bannerImage"`
 			CoverImage  struct {
 				Color      string `json:"color"`
 				ExtraLarge string `json:"extraLarge"`
@@ -122,10 +126,19 @@ func getAnime(username string, id int) (AnimeResult, error) {
 		return AnimeResult{}, fmt.Errorf("%s", result.Errors)
 	}
 
+	title := result.Data.Media.Title.English
+	if title == "" {
+		if len(result.Data.Media.Synonyms) > 0 {
+			title = result.Data.Media.Synonyms[0]
+		} else {
+			title = result.Data.Media.Title.Romaji
+		}
+	}
+
 	anime := AnimeResult{
 		Progress: result.Data.MediaList.Progress,
 		Episodes: result.Data.Media.Episodes,
-		Title:    result.Data.Media.Title.English,
+		Title:    title,
 		Color:    result.Data.Media.CoverImage.Color,
 		Duration: result.Data.Media.Duration,
 	}
